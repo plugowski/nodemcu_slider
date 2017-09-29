@@ -18,11 +18,9 @@ function Dolly(motor)
   local gotoStart = function()
     
     local distance = 0
-    local stop = gpio.read(config.pins.stop)
  
-    while (stop ~= gpio.HIGH) do
+    while (gpio.read(config.pins.stop) ~= gpio.HIGH) do
       distance = distance + motor.step('R')
-      stop = gpio.read(config.pins.stop)
     end
     
     position = 0

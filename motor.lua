@@ -19,14 +19,16 @@ function Motor(resolution, pulley)
   -- driver status
   local sleepStatus = 0
   
-  -- ustawianie pinow do obrotu
-  -- ustawienie pinu do kierunku
-  -- wyzerowanie wszystkich pinow
+  -- init gpio pins and make motor ready
   local init = function()
     gpio.mode(config.pins.sleep, gpio.OUTPUT)
     gpio.mode(config.pins.step, gpio.OUTPUT)
     gpio.mode(config.pins.dir, gpio.OUTPUT)
     gpio.mode(config.pins.stop, gpio.INPUT)
+    
+    gpio.write(config.pins.sleep, gpio.LOW)
+    gpio.write(config.pins.step, gpio.LOW)
+    gpio.write(config.pins.dir, gpio.LOW)
   end
   
   local wakeup = function()

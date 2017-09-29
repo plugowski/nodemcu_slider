@@ -15,4 +15,4 @@ config = ini.parse_file('config.ini')
 
 local motor = Motor(config.motor.resolution, config.motor.pulley_diameter) 
 local dolly = Dolly(motor)
-local slider = Slider(config.slider.length, dolly);
+local slider = Slider(config.slider.length, dolly)
