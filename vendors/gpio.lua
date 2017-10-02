@@ -20,7 +20,7 @@ function gpio()
     local value = pinLevels[pin] or 0
     
     -- to simulate pressing stop button
-    if pin == config.pins.stop then
+    if pin == 2 then
       math.randomseed(os.time())
       if math.floor(math.random(1, 100)) > 60 then
         value = 1

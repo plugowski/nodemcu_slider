@@ -10,7 +10,7 @@
 -- # move on specified direction
 -- # todo: change step mode 1/2, 1/4, 1/8 i 1/16 for better precission
 
-function Motor(resolution, pulley)
+function Motor(pins, resolution, pulley)
   
   -- distance for one pulley rotate
   local rotate = 2 * 3.1415 * (pulley / 2)
@@ -21,28 +21,33 @@ function Motor(resolution, pulley)
   
   -- init gpio pins and make motor ready
   local init = function()
-    gpio.mode(config.pins.sleep, gpio.OUTPUT)
-    gpio.mode(config.pins.step, gpio.OUTPUT)
-    gpio.mode(config.pins.dir, gpio.OUTPUT)
-    gpio.mode(config.pins.stop, gpio.INPUT)
+    gpio.mode(pins.motor_sleep, gpio.OUTPUT)
+    gpio.mode(pins.motor_step, gpio.OUTPUT)
+    gpio.mode(pins.motor_dir, gpio.OUTPUT)
+    gpio.mode(pins.motor_stop, gpio.INPUT)
     
-    gpio.write(config.pins.sleep, gpio.LOW)
-    gpio.write(config.pins.step, gpio.LOW)
-    gpio.write(config.pins.dir, gpio.LOW)
+    gpio.write(pins.motor_sleep, gpio.LOW)
+    gpio.write(pins.motor_step, gpio.LOW)
+    gpio.write(pins.motor_dir, gpio.LOW)
   end
   
   local wakeup = function()
-    gpio.write(config.pins.sleep, gpio.LOW)
+    gpio.write(pins.motor_sleep, gpio.LOW)
     sleepStatus = 0
   end
   
   local hibernate = function()
-    gpio.write(config.pins.sleep, gpio.HIGH)
+    gpio.write(pins.motor_sleep, gpio.HIGH)
     sleepStatus = 1
   end
   
   local isSleep = function()
     return sleepStatus
+  end
+  
+  local limitSwitch = function()
+    io.write('.')
+    return gpio.read(pins.motor_stop) == gpio.HIGH
   end
   
   -- interval for stepper
@@ -63,12 +68,12 @@ function Motor(resolution, pulley)
   local step = function(direction)
     
     if direction == 'R' then
-       gpio.write(config.pins.dir, gpio.HIGH)
+       gpio.write(pins.motor_dir, gpio.HIGH)
     end
     
-     gpio.write(config.pins.step, gpio.HIGH)
-     gpio.write(config.pins.step, gpio.LOW)
-     gpio.write(config.pins.dir, gpio.LOW)
+     gpio.write(pins.motor_step, gpio.HIGH)
+     gpio.write(pins.motor_step, gpio.LOW)
+     gpio.write(pins.motor_dir, gpio.LOW)
 
     -- return the distance in mm
     return stepDistance;
@@ -76,8 +81,9 @@ function Motor(resolution, pulley)
   
   -- move dolly by distance and direction L|R (left, right)
   local move = function(distance, direction, time)
+    
     local dst = 0;
-    while dst < distance do
+    while dst < distance and limitSwitch == false do
       dst = dst + step(direction)
       if time ~= nil then
         sleep(getInterval(distance, time))
@@ -91,6 +97,7 @@ function Motor(resolution, pulley)
   -- public some local methods
   return {
     isSleep = isSleep,
+    limitSwitch = limitSwitch,
     wakeup = wakeup,
     sleep = sleep,
     step = step,

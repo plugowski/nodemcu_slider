@@ -28,7 +28,7 @@ function Slider(length, dolly)
   -- validate possible postion if it is in scope
   local validate = function(position)
 
-    if position < 0 or position > (length * 1) then
+    if position < 0 or position > length * 1 then
       return false
     end
     

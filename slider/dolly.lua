@@ -18,8 +18,9 @@ function Dolly(motor)
   local gotoStart = function()
     
     local distance = 0
- 
-    while (gpio.read(config.pins.stop) ~= gpio.HIGH) do
+    
+     -- todo: odpowiedzialnosc silnika, aby sprawdzic, czy nie powinien sie zatrzymac?
+    while motor.limitSwitch() == false do
       distance = distance + motor.step('R')
     end
     
