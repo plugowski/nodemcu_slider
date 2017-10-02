@@ -61,6 +61,7 @@ function Motor(pins, resolution, pulley)
     local stepper = speed / stepDistance
     -- interval = s / step
     local interval = 1 / stepper
+    
     return interval
   end
   
@@ -84,13 +85,14 @@ function Motor(pins, resolution, pulley)
     
     local dst = 0;
     local interval = getInterval(distance, time)
-    
+
     while dst <= distance and limitSwitch() == false do
       dst = dst + step(direction)
       if time ~= nil then
         sleep(interval)
       end
     end
+    
     return dst
   end
   
