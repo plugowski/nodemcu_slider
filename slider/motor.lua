@@ -41,12 +41,13 @@ function Motor(pins, resolution, pulley)
     sleepStatus = 1
   end
   
+  -- get motor hibernation status
   local isSleep = function()
     return sleepStatus
   end
   
+  -- get limit switch status true for limit reached
   local limitSwitch = function()
-    io.write('.')
     return gpio.read(pins.motor_stop) == gpio.HIGH
   end
   
@@ -60,7 +61,6 @@ function Motor(pins, resolution, pulley)
     local stepper = speed / stepDistance
     -- interval = s / step
     local interval = 1 / stepper
-    
     return interval
   end
   
@@ -83,10 +83,12 @@ function Motor(pins, resolution, pulley)
   local move = function(distance, direction, time)
     
     local dst = 0;
-    while dst < distance and limitSwitch == false do
+    local interval = getInterval(distance, time)
+    
+    while dst <= distance and limitSwitch() == false do
       dst = dst + step(direction)
       if time ~= nil then
-        sleep(getInterval(distance, time))
+        sleep(interval)
       end
     end
     return dst
